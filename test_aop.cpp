@@ -24,25 +24,31 @@
 template <template <class> class A = aop::NullAspect>
 class Number
 {
-    public:
+public:
     typedef typename aop::InnerType<Number, A>::Type Type;
 
     Number(float n)
         : n(n)
     {}
 
-    Type operator+(const Type& other)
+    Type operator+(const Type& other) const
     {
         return Type(n + other.n);
     }
+
+    friend std::ostream& operator<<(std::ostream& out, const Number& number)
+    {
+        return out << number.n;
+    }
+protected:
     float n;
 };
 
 template <class A>
 class RoundAspect : public A
 {
-    public:
-        typedef typename A::Type Type;
+public:
+    typedef typename A::Type Type;
 
     RoundAspect(float n)
         : A(n)
@@ -52,13 +58,13 @@ class RoundAspect : public A
         : A(a)
     {}
 
-    Type operator+(const Type& other)
+    Type operator+(const Type& other) const
     {
         return Type(round(A::operator+(other).n));
     }
 
-    private:
-    static float round(float f) 
+private:
+    static float round(float f)
     {
         return std::ceil(f);
     }
@@ -70,7 +76,7 @@ void example()
     N a(1);
     N b(1.3);
     N c = a + b;
-    std::cout << c.n << std::endl;
+    std::cout << c << std::endl;
 }
 
 int main()

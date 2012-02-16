@@ -44,7 +44,7 @@ struct Decorate
 {
     struct None {};
 
-    template <template <class> class A, class B=None>
+    template <template <class> class A, class B = None>
     struct Binder
     {
         template <class T>
