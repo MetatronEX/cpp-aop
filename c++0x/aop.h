@@ -28,15 +28,22 @@ class NullAspect
 {};
 
 template <template <template <class> class> class Base, template <class> class A>
-struct InnerType
+struct BaseAopData
 {
     typedef typename A<Base<A>>::Type Type;
 };
 
 template <template <template <class> class> class Base>
-struct InnerType<Base, NullAspect>
+struct BaseAopData<Base, NullAspect>
 {
     typedef Base<NullAspect> Type;
+};
+
+template <template <class> class Aspect, class A>
+struct AspectAopData
+{
+    typedef typename A::AopData::Type Type;
+    typedef Aspect<A> AspectType;
 };
 
 template <template <template <class> class> class Base>

@@ -25,15 +25,16 @@ template <template <class> class A = aop::NullAspect>
 class Number
 {
 public:
-    typedef typename aop::InnerType<Number, A>::Type Type;
+    typedef aop::BaseAopData<Number, A> AopData; //Needed by lib
+    typedef typename AopData::Type FullType;
 
     Number(float n)
         : n(n)
     {}
 
-    Type operator+(const Type& other) const
+    FullType operator+(const FullType& other) const
     {
-        return Type(n + other.n);
+        return FullType(n + other.n);
     }
 
     friend std::ostream& operator<<(std::ostream& out, const Number& number)
@@ -44,29 +45,59 @@ protected:
     float n;
 };
 
+/*
+* Configurable Aspect example
+*/
+template <int PRECISION>
+struct RoundAspect
+{
+    template <class A>
+    class Type : public A
+    {
+    public:
+        typedef aop::AspectAopData<Type, A> AopData;
+        typedef typename AopData::Type FullType;
+
+        Type(float n)
+            : A(n)
+        {}
+
+        Type(const A& a)
+            : A(a)
+        {}
+
+        FullType operator+(const FullType& other) const
+        {
+            return FullType(round(A::operator+(other).n));
+        }
+
+    private:
+        static float round(float f)
+        {
+            const unsigned int e = std::pow(10, PRECISION);
+            return float(int(f * e)) / e;
+        }
+    };
+};
+
 template <class A>
-class RoundAspect : public A
+class IncAspect: public A
 {
 public:
-    typedef typename A::Type Type;
+    typedef aop::AspectAopData<IncAspect, A> AopData;
+    typedef typename AopData::Type FullType;
 
-    RoundAspect(float n)
+    IncAspect(float n)
         : A(n)
     {}
 
-    RoundAspect(const A& a)
+    IncAspect(const A& a)
         : A(a)
     {}
 
-    Type operator+(const Type& other) const
+    FullType operator+(const FullType& other) const
     {
-        return Type(round(A::operator+(other).n));
-    }
-
-private:
-    static float round(float f)
-    {
-        return std::ceil(f);
+        return FullType(A::operator+(other).n + 1);
     }
 };
 
@@ -74,7 +105,7 @@ template <class N>
 void example()
 {
     N a(1);
-    N b(1.3);
+    N b(1.33333);
     N c = a + b;
     std::cout << c << std::endl;
 }
@@ -83,6 +114,10 @@ int main()
 {
     example<Number<>>();
 
-    typedef aop::Decorate<Number>::with<RoundAspect>::Type RoundNumber;
+    typedef aop::Decorate<Number>::with<RoundAspect<2>::Type>::Type RoundNumber;
     example<RoundNumber>();
+
+    typedef aop::Decorate<Number>::with<RoundAspect<2>::Type, IncAspect>::Type IncNumber;
+    example<IncNumber>();
+    return 0;
 }
