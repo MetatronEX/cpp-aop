@@ -46,7 +46,7 @@ protected:
 };
 
 /*
-* Configurable Aspect example
+* Configurable Aspect sumExample
 */
 template <int PRECISION>
 struct RoundAspect
@@ -81,43 +81,61 @@ struct RoundAspect
 };
 
 template <class A>
-class IncAspect: public A
+class LogicalAspect: public A
 {
 public:
-    typedef aop::AspectAopData<IncAspect, A> AopData;
+    typedef aop::AspectAopData<LogicalAspect, A> AopData;
     typedef typename AopData::Type FullType;
 
-    IncAspect(float n)
+    LogicalAspect(float n)
         : A(n)
     {}
 
-    IncAspect(const A& a)
+    LogicalAspect(const A& a)
         : A(a)
     {}
 
-    FullType operator+(const FullType& other) const
+    bool operator!() const
     {
-        return FullType(A::operator+(other).n + 1);
+        return !A::n;
+    }
+    
+    bool operator&&(const LogicalAspect& o) const
+    {
+        return A::n && o.n;
+    }
+
+    bool operator||(const LogicalAspect& o) const
+    {
+        return A::n || o.n;
     }
 };
 
 template <class N>
-void example()
+void sumExample(float n1, float n2)
 {
-    N a(1);
-    N b(1.33333);
+    N a(n1);
+    N b(n2);
     N c = a + b;
     std::cout << c << std::endl;
 }
 
+template <class N>
+void orExample(float n1, float n2)
+{
+    N a(n1);
+    N b(n2);
+    std::cout << (a || b) << std::endl;
+}
+
 int main()
 {
-    example<Number<>>();
+    sumExample<Number<>>(1, 2);
 
     typedef aop::Decorate<Number>::with<RoundAspect<2>::Type>::Type RoundNumber;
-    example<RoundNumber>();
+    sumExample<RoundNumber>(1.339, 1.1233);
 
-    typedef aop::Decorate<Number>::with<RoundAspect<2>::Type, IncAspect>::Type IncNumber;
-    example<IncNumber>();
+    typedef aop::Decorate<Number>::with<RoundAspect<2>::Type, LogicalAspect>::Type RoundLogicalNumber;
+    orExample<RoundLogicalNumber>(1, 0);
     return 0;
 }
