@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 Hugo Arregui
+    Copyright (C) 2011, 2012 Hugo Arregui
 
     This file is part of the cpp-aop Library.
 
@@ -23,19 +23,6 @@
 namespace aop
 {
 
-#define TYPELIST_1(type) \
-    aop::Typelist<type, aop::NullType>
-
-#define TYPELIST_2(type1, type2) \
-    aop::Typelist<type1, TYPELIST_1(type2) >
-
-struct NullType
-{};
-
-template <template <class> class T, class U>
-struct Typelist
-{};
-
 template <class A>
 class NullAspect
 {};
@@ -43,7 +30,7 @@ class NullAspect
 template <template <template <class> class> class Base, template <class> class A>
 struct BaseAopData
 {
-    typedef typename A<Base<A> >::Type Type;
+    typedef typename A<Base<A>>::Type Type;
 };
 
 template <template <template <class> class> class Base>
@@ -62,7 +49,9 @@ struct AspectAopData
 template <template <template <class> class> class Base>
 struct Decorate
 {
-    template <template <class> class A, class B = NullType>
+    struct None {};
+
+    template <template <class> class A, class B = None>
     struct Binder
     {
         template <class T>
@@ -73,7 +62,7 @@ struct Decorate
     };
 
     template<template <class> class T>
-    struct Binder<T, NullType>
+    struct Binder<T, None>
     {
         template <class P>
         struct Binding
@@ -82,26 +71,26 @@ struct Decorate
         };
     };
 
-    template <class Args>
+    template <template <class> class ... Args>
     struct Combination;
 
-    template <template <class> class Head>
-    struct Combination<Typelist<Head, NullType> >
+    template <template <class> class T>
+    struct Combination<T>
     {
-        typedef Binder<Head> Type;
+        typedef Binder<T> Type;
     };
 
-    template <template <class> class Head, class Tail>
-    struct Combination<Typelist<Head, Tail> >
+    template<template <class> class A1, template <class> class ... Args>
+    struct Combination<A1, Args...>
     {
-        typedef Binder<Head, typename Combination<Tail>::Type> Type;
+        typedef Binder<A1, typename Combination<Args...>::Type> Type;
     };
 
-    template<class Args>
+    template<template <class> class ... Args>
     struct with
     {
-        typedef typename Combination<Args>::Type TypeP;
-        typedef typename TypeP::template Binding<Base<TypeP::template Binding> >::Type Type;
+        typedef typename Combination<Args...>::Type TypeP;
+        typedef typename TypeP::template Binding<Base<TypeP::template Binding>>::Type Type;
     };
 };
 }
