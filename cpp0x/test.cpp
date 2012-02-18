@@ -132,18 +132,10 @@ int main()
 {
     sumExample<Number<> >(1, 2);
 
-    #ifdef CPP98
-    typedef aop::Decorate<Number>::with<TYPELIST_1(RoundAspect<2>::Type)>::Type RoundNumber;
-    #else
     typedef aop::Decorate<Number>::with<RoundAspect<2>::Type>::Type RoundNumber;
-    #endif
     sumExample<RoundNumber>(1.339, 1.1233);
 
-    #ifdef CPP98
-    typedef aop::Decorate<Number>::with<TYPELIST_2(RoundAspect<2>::Type, LogicalAspect)>::Type RoundLogicalNumber;
-    #else
     typedef aop::Decorate<Number>::with<RoundAspect<2>::Type, LogicalAspect>::Type RoundLogicalNumber;
-    #endif
     orExample<RoundLogicalNumber>(1, 0);
     return 0;
 }
