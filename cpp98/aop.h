@@ -82,25 +82,25 @@ struct Decorate
         };
     };
 
-    template <class Args>
-    struct Combination;
+    template <class Aspects>
+    struct Apply;
 
     template <template <class> class Head>
-    struct Combination<Typelist<Head, NullType> >
+    struct Apply<Typelist<Head, NullType> >
     {
         typedef Binder<Head> Type;
     };
 
     template <template <class> class Head, class Tail>
-    struct Combination<Typelist<Head, Tail> >
+    struct Apply<Typelist<Head, Tail> >
     {
-        typedef Binder<Head, typename Combination<Tail>::Type> Type;
+        typedef Binder<Head, typename Apply<Tail>::Type> Type;
     };
 
-    template<class Args>
+    template<class Aspects>
     struct with
     {
-        typedef typename Combination<Args>::Type TypeP;
+        typedef typename Apply<Aspects>::Type TypeP;
         typedef typename TypeP::template Binding<Base<TypeP::template Binding> >::Type Type;
     };
 };

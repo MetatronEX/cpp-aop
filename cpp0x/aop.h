@@ -71,25 +71,25 @@ struct Decorate
         };
     };
 
-    template <template <class> class ... Args>
-    struct Combination;
+    template <template <class> class ... Aspects>
+    struct Apply;
 
     template <template <class> class T>
-    struct Combination<T>
+    struct Apply<T>
     {
         typedef Binder<T> Type;
     };
 
-    template<template <class> class A1, template <class> class ... Args>
-    struct Combination<A1, Args...>
+    template<template <class> class A1, template <class> class ... Aspects>
+    struct Apply<A1, Aspects...>
     {
-        typedef Binder<A1, typename Combination<Args...>::Type> Type;
+        typedef Binder<A1, typename Apply<Aspects...>::Type> Type;
     };
 
-    template<template <class> class ... Args>
+    template<template <class> class ... Aspects>
     struct with
     {
-        typedef typename Combination<Args...>::Type TypeP;
+        typedef typename Apply<Aspects...>::Type TypeP;
         typedef typename TypeP::template Binding<Base<TypeP::template Binding>>::Type Type;
     };
 };
