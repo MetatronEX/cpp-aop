@@ -21,28 +21,33 @@
 #include <cmath>
 #include "aop.h"
 
-template <template <class> class A = aop::NullAspect>
-class Number
+template <typename _UnderlyingType>
+struct Number
 {
-public:
-    typedef aop::BaseAopData< ::Number, A> AopData; //Needed by lib
-    typedef typename AopData::Type FullType;
-
-    Number(float n)
-        : n(n)
-    {}
-
-    FullType operator+(const FullType& other) const
+    template <template <class> class A = aop::NullAspect>
+    class Type
     {
-        return FullType(n + other.n);
-    }
+    public:
+        typedef _UnderlyingType UnderlyingType;
+        typedef aop::BaseAopData< Number::Type, A> AopData; //Needed by lib
+        typedef typename AopData::Type FullType;
 
-    friend std::ostream& operator<<(std::ostream& out, const Number& number)
-    {
-        return out << number.n;
-    }
-protected:
-    float n;
+        Type(UnderlyingType n)
+            : n(n)
+        {}
+
+        FullType operator+(const FullType& other) const
+        {
+            return FullType(n + other.n);
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const Type& number)
+        {
+            return out << number.n;
+        }
+    protected:
+        UnderlyingType n;
+    };
 };
 
 /*
@@ -58,7 +63,7 @@ struct RoundAspect
         typedef aop::AspectAopData< RoundAspect::Type, A> AopData;
         typedef typename AopData::Type FullType;
 
-        Type(float n)
+        Type(typename A::UnderlyingType n)
             : A(n)
         {}
 
@@ -87,7 +92,7 @@ public:
     typedef aop::AspectAopData< ::LogicalAspect, A> AopData;
     typedef typename AopData::Type FullType;
 
-    LogicalAspect(float n)
+    LogicalAspect(typename A::UnderlyingType n)
         : A(n)
     {}
 
@@ -100,19 +105,19 @@ public:
         return !A::n;
     }
     
-    bool operator&&(const LogicalAspect& o) const
+    bool operator&&(const FullType& o) const
     {
         return A::n && o.n;
     }
 
-    bool operator||(const LogicalAspect& o) const
+    bool operator||(const FullType& o) const
     {
         return A::n || o.n;
     }
 };
 
 template <class N>
-void sumExample(float n1, float n2)
+void sumExample(typename N::UnderlyingType n1, typename N::UnderlyingType n2)
 {
     N a(n1);
     N b(n2);
@@ -121,7 +126,7 @@ void sumExample(float n1, float n2)
 }
 
 template <class N>
-void orExample(float n1, float n2)
+void orExample(typename N::UnderlyingType n1, typename N::UnderlyingType n2)
 {
     N a(n1);
     N b(n2);
@@ -130,12 +135,16 @@ void orExample(float n1, float n2)
 
 int main()
 {
-    sumExample<Number<> >(1, 2);
+    sumExample<Number<int>::Type<> >(1, 2);
 
-    typedef aop::Decorate<Number>::with<TYPELIST_1(RoundAspect<2>::Type)>::Type RoundNumber;
-    sumExample<RoundNumber>(1.339, 1.1233);
+    typedef aop::Decorate<Number<float>::Type>::with<TYPELIST_1(RoundAspect<2>::Type)>::Type FloatRoundNumber;
+    sumExample<FloatRoundNumber>(1.339, 1.1233);
 
-    typedef aop::Decorate<Number>::with<TYPELIST_2(RoundAspect<2>::Type, LogicalAspect)>::Type RoundLogicalNumber;
-    orExample<RoundLogicalNumber>(1, 0);
+    typedef TYPELIST_2(RoundAspect<2>::Type, LogicalAspect) RoundLogicalList;
+    typedef aop::Decorate<Number<float>::Type>::with<RoundLogicalList>::Type FloatRoundLogicalNumber;
+    orExample<FloatRoundLogicalNumber>(1, 0);
+
+    typedef aop::Decorate<Number<int>::Type>::with<TYPELIST_1(LogicalAspect)>::Type IntLogicalNumber;
+    orExample<IntLogicalNumber>(1, 0);
     return 0;
 }
