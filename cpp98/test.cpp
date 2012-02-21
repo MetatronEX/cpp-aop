@@ -25,7 +25,7 @@ template <template <class> class A = aop::NullAspect>
 class Number
 {
 public:
-    typedef aop::BaseAopData<Number, A> AopData; //Needed by lib
+    typedef aop::BaseAopData< ::Number, A> AopData; //Needed by lib
     typedef typename AopData::Type FullType;
 
     Number(float n)
@@ -55,7 +55,7 @@ struct RoundAspect
     class Type : public A
     {
     public:
-        typedef aop::AspectAopData<Type, A> AopData;
+        typedef aop::AspectAopData< RoundAspect::Type, A> AopData;
         typedef typename AopData::Type FullType;
 
         Type(float n)
@@ -84,7 +84,7 @@ template <class A>
 class LogicalAspect: public A
 {
 public:
-    typedef aop::AspectAopData<LogicalAspect, A> AopData;
+    typedef aop::AspectAopData< ::LogicalAspect, A> AopData;
     typedef typename AopData::Type FullType;
 
     LogicalAspect(float n)
