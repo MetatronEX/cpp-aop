@@ -160,7 +160,7 @@ public:
     FullType& operator>>=(const FullType& bitcount)
     {
         A::n >>= bitcount.n;
-        return *this;
+        return *static_cast<FullType*>(this);
     }
 };
 
@@ -186,7 +186,7 @@ void bitwiseExample(typename N::UnderlyingType n1, typename N::UnderlyingType n2
 {
     N a(n1);
     N b(n2);
-    std::cout << (a + (b << 3)) << std::endl;
+    std::cout << (a + ((b>>=1) << 3)) << std::endl;
 }
 
 int main()
@@ -196,7 +196,7 @@ int main()
     typedef aop::Decorate<Number<float>::Type>::with<TYPELIST_1(RoundAspect<2>::Type)>::Type FloatRoundNumber;
     sumExample<FloatRoundNumber>(1.339, 1.1233);
 
-    typedef aop::Decorate<Number<unsigned int>::Type>::with<TYPELIST_1(BitwiseAspect)>::Type IntegralNumber;
+    typedef aop::Decorate<Number<unsigned int>::Type>::with<TYPELIST_2(LogicalAspect, BitwiseAspect)>::Type IntegralNumber;
     bitwiseExample<IntegralNumber>(1, 2);
 
     typedef TYPELIST_2(RoundAspect<2>::Type, LogicalAspect) RoundLogicalList;
