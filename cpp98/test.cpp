@@ -156,6 +156,12 @@ public:
     {
         return A::n >> bitcount.n;
     }
+
+    FullType& operator>>=(const FullType& bitcount)
+    {
+        A::n >>= bitcount.n;
+        return *this;
+    }
 };
 
 template <class N>

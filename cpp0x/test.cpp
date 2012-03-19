@@ -21,6 +21,8 @@
 #include <cmath>
 #include "aop.h"
 
+//#define INHERITING_CTORS  as of g++ 6.4.3, inheriting ctors was not implemented
+
 template <typename _UnderlyingType>
 struct Number
 {
@@ -63,6 +65,9 @@ struct RoundAspect
         typedef aop::AspectAopData< RoundAspect::Type, A> AopData;
         typedef typename AopData::Type FullType;
 
+#ifdef INHERITING_CTORS
+        using A::A;
+#else
         Type(typename A::UnderlyingType n)
             : A(n)
         {}
@@ -70,6 +75,7 @@ struct RoundAspect
         Type(const A& a)
             : A(a)
         {}
+#endif
 
         FullType operator+(const FullType& other) const
         {
@@ -92,6 +98,9 @@ public:
     typedef aop::AspectAopData< ::LogicalAspect, A> AopData;
     typedef typename AopData::Type FullType;
 
+#ifdef INHERITING_CTORS
+    using A::A;
+#else
     LogicalAspect(typename A::UnderlyingType n)
         : A(n)
     {}
@@ -99,6 +108,7 @@ public:
     LogicalAspect(const A& a)
         : A(a)
     {}
+#endif
 
     bool operator!() const
     {
@@ -123,6 +133,9 @@ public:
     typedef aop::AspectAopData< ::LogicalAspect, A> AopData;
     typedef typename AopData::Type FullType;
 
+#ifdef INHERITING_CTORS
+    using A::A;
+#else
     BitwiseAspect(typename A::UnderlyingType n)
         : A(n)
     {}
@@ -130,6 +143,7 @@ public:
     BitwiseAspect(const A& a)
         : A(a)
     {}
+#endif
 
     bool operator~() const
     {
@@ -154,6 +168,12 @@ public:
     FullType operator>>(const FullType& bitcount) const
     {
         return A::n >> bitcount.n;
+    }
+
+    FullType& operator>>=(const FullType& bitcount)
+    {
+        A::n >>= bitcount.n;
+        return *this;
     }
 };
 

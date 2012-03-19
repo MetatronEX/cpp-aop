@@ -9,4 +9,4 @@ cpp98: clean
 all: cpp11 cpp98
 
 clean:
-	rm -f test_aop
+	rm -f test_aop_*
