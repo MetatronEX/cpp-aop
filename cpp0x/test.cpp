@@ -116,6 +116,47 @@ public:
     }
 };
 
+template <class A>
+class BitwiseAspect: public A
+{
+public:
+    typedef aop::AspectAopData< ::LogicalAspect, A> AopData;
+    typedef typename AopData::Type FullType;
+
+    BitwiseAspect(typename A::UnderlyingType n)
+        : A(n)
+    {}
+
+    BitwiseAspect(const A& a)
+        : A(a)
+    {}
+
+    bool operator~() const
+    {
+        return ~A::n;
+    }
+    
+    FullType operator&(const FullType& mask) const
+    {
+        return A::n & mask.n;
+    }
+
+    FullType operator|(const FullType& mask) const
+    {
+        return A::n | mask.n;
+    }
+
+    FullType operator<<(const FullType& bitcount) const
+    {
+        return A::n << bitcount.n;
+    }
+
+    FullType operator>>(const FullType& bitcount) const
+    {
+        return A::n >> bitcount.n;
+    }
+};
+
 template <class N>
 void sumExample(typename N::UnderlyingType n1, typename N::UnderlyingType n2)
 {
@@ -133,12 +174,23 @@ void orExample(typename N::UnderlyingType n1, typename N::UnderlyingType n2)
     std::cout << (a || b) << std::endl;
 }
 
+template <class N>
+void bitwiseExample(typename N::UnderlyingType n1, typename N::UnderlyingType n2)
+{
+    N a(n1);
+    N b(n2);
+    std::cout << (a + (b << 3)) << std::endl;
+}
+
 int main()
 {
     sumExample<Number<int>::Type<> >(1, 2);
 
     typedef aop::Decorate<Number<float>::Type>::with<RoundAspect<2>::Type>::Type FloatRoundNumber;
     sumExample<FloatRoundNumber>(1.339, 1.1233);
+
+    typedef aop::Decorate<Number<unsigned int>::Type>::with<BitwiseAspect>::Type IntegralNumber;
+    bitwiseExample<IntegralNumber>(1, 2);
 
     typedef aop::Decorate<Number<float>::Type>::with<RoundAspect<2>::Type, LogicalAspect>::Type FloatRoundLogicalNumber;
     orExample<FloatRoundLogicalNumber>(1, 0);
