@@ -29,6 +29,12 @@ namespace aop
 #define TYPELIST_2(type1, type2) \
     aop::Typelist<type1, TYPELIST_1(type2) >
 
+#define TYPELIST_3(type1, type2, type3) \
+    aop::Typelist<type1, TYPELIST_2(type2, type3) >
+
+#define TYPELIST_4(type1, type2, type3, type4) \
+    aop::Typelist<type1, TYPELIST_3(type2, type3, type4) >
+
 struct NullType
 {};
 

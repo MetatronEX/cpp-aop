@@ -270,22 +270,17 @@ void bitwiseExample(typename N::UnderlyingType n1, typename N::UnderlyingType n2
 
 int main()
 {
-    //typedef aop::Decorate<Number<float>::Type>::with<TYPELIST_1(RoundAspect<2>::Type)>::Type FloatRoundNumber;
-    //sumExample<FloatRoundNumber>(1.339, 1.1233);
-
     typedef aop::Decorate<Number<unsigned int>::Type>::with<
-        TYPELIST_2(LogicalAspect,
-            TYPELIST_2(ArithmeticAspect,
-                TYPELIST_2(IncrementalAspect, BitwiseAspect)))>::Type IntegralNumber;
+        TYPELIST_4(LogicalAspect, ArithmeticAspect, IncrementalAspect, BitwiseAspect)>::Type IntegralNumber;
     sumExample<IntegralNumber>(1, 2);
     bitwiseExample<IntegralNumber>(1, 2);
-/*
+
     typedef TYPELIST_2(RoundAspect<2>::Type, LogicalAspect) RoundLogicalList;
     typedef aop::Decorate<Number<float>::Type>::with<RoundLogicalList>::Type FloatRoundLogicalNumber;
     orExample<FloatRoundLogicalNumber>(1, 0);
 
     typedef aop::Decorate<Number<int>::Type>::with<TYPELIST_1(LogicalAspect)>::Type IntLogicalNumber;
     orExample<IntLogicalNumber>(1, 0);
-*/
+
     return 0;
 }
