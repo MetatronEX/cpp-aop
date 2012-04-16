@@ -38,11 +38,6 @@ struct Number
             : n(n)
         {}
 
-        FullType operator+(const FullType& other) const
-        {
-            return FullType(n + other.n);
-        }
-
         friend std::ostream& operator<<(std::ostream& out, const Type& number)
         {
             return out << number.n;
@@ -50,6 +45,98 @@ struct Number
     protected:
         UnderlyingType n;
     };
+};
+
+template <class A>
+class ArithmeticAspect: public A
+{
+public:
+    typedef aop::AspectAopData< ::ArithmeticAspect, A> AopData;
+    typedef typename AopData::Type FullType;
+
+#ifdef INHERITING_CTORS
+    using A::A;
+#else
+    ArithmeticAspect(typename A::UnderlyingType n)
+        : A(n)
+    {}
+
+    ArithmeticAspect(const A& a)
+        : A(a)
+    {}
+#endif
+
+    FullType operator+(const FullType& other) const
+    {
+        FullType tmp(*this);
+        return tmp += other;
+    }
+
+    FullType operator-(const FullType& other) const
+    {
+        FullType tmp(*this);
+        return tmp -= other;
+    }
+
+    FullType operator+=(const FullType& other)
+    {
+        A::n += other.n;
+        return A::n;
+    }
+
+    FullType operator-=(const FullType& other)
+    {
+        A::n -= other.n;
+        return A::n;
+    }
+
+    // same for *, *=, /, /=
+};
+
+template <class A>
+class IncrementalAspect: public A
+{
+public:
+    typedef aop::AspectAopData< ::IncrementalAspect, A> AopData;
+    typedef typename AopData::Type FullType;
+
+#ifdef INHERITING_CTORS
+    using A::A;
+#else
+    IncrementalAspect(typename A::UnderlyingType n)
+        : A(n)
+    {}
+
+    IncrementalAspect(const A& a)
+        : A(a)
+    {}
+#endif
+
+    FullType operator++(int)
+    {
+        FullType tmp(*this);
+        operator++();
+        return tmp;
+    }
+
+    FullType operator++()
+    {
+        ++A::n;
+        return *this;
+    }
+
+    FullType operator--(int)
+    {
+        FullType tmp(*this);
+        operator--();
+        return tmp;
+    }
+
+    FullType operator--()
+    {
+        --A::n;
+        return *this;
+    }
 };
 
 /*
@@ -115,14 +202,14 @@ public:
         return !A::n;
     }
     
-    bool operator&&(const FullType& o) const
+    bool operator&&(const FullType& other) const
     {
-        return A::n && o.n;
+        return A::n && other.n;
     }
 
-    bool operator||(const FullType& o) const
+    bool operator||(const FullType& other) const
     {
-        return A::n || o.n;
+        return A::n || other.n;
     }
 };
 
@@ -204,18 +291,19 @@ void bitwiseExample(typename N::UnderlyingType n1, typename N::UnderlyingType n2
 
 int main()
 {
-    sumExample<Number<int>::Type<> >(1, 2);
 
-    typedef aop::Decorate<Number<float>::Type>::with<RoundAspect<2>::Type>::Type FloatRoundNumber;
-    sumExample<FloatRoundNumber>(1.339, 1.1233);
-
-    typedef aop::Decorate<Number<unsigned int>::Type>::with<LogicalAspect, BitwiseAspect>::Type IntegralNumber;
+    typedef aop::Decorate<Number<unsigned int>::Type>::with<ArithmeticAspect, IncrementalAspect, LogicalAspect, BitwiseAspect>::Type IntegralNumber;
     bitwiseExample<IntegralNumber>(1, 2);
+    sumExample<IntegralNumber>(1, 2);
 
-    typedef aop::Decorate<Number<float>::Type>::with<RoundAspect<2>::Type, LogicalAspect>::Type FloatRoundLogicalNumber;
+    typedef aop::Decorate<Number<float>::Type>::with<RoundAspect<2>::Type, ArithmeticAspect, LogicalAspect>::Type FloatRoundLogicalNumber;
     orExample<FloatRoundLogicalNumber>(1, 0);
 
     typedef aop::Decorate<Number<int>::Type>::with<LogicalAspect>::Type IntLogicalNumber;
     orExample<IntLogicalNumber>(1, 0);
+
+    typedef aop::Decorate<Number<float>::Type>::with<RoundAspect<2>::Type, ArithmeticAspect>::Type FloatRoundNumber;
+    sumExample<FloatRoundNumber>(1.339, 1.1233);
+
     return 0;
 }
