@@ -201,7 +201,7 @@ public:
     {
         return !A::n;
     }
-    
+
     bool operator&&(const FullType& other) const
     {
         return A::n && other.n;
@@ -236,7 +236,7 @@ public:
     {
         return ~A::n;
     }
-    
+
     FullType operator&(const FullType& mask) const
     {
         return A::n & mask.n;
@@ -286,7 +286,7 @@ void bitwiseExample(typename N::UnderlyingType n1, typename N::UnderlyingType n2
 {
     N a(n1);
     N b(n2);
-    std::cout << (a + ((b>>=1) << 3)) << std::endl;
+    std::cout << (a + ((b >>= 1) << 3)) << std::endl;
 }
 
 int main()

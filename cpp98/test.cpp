@@ -183,7 +183,7 @@ public:
     {
         return !A::n;
     }
-    
+
     bool operator&&(const FullType& o) const
     {
         return A::n && o.n;
@@ -215,7 +215,7 @@ public:
     {
         return ~A::n;
     }
-    
+
     FullType operator&(const FullType& o) const
     {
         return A::n & o.n;
@@ -265,7 +265,7 @@ void bitwiseExample(typename N::UnderlyingType n1, typename N::UnderlyingType n2
 {
     N a(n1);
     N b(n2);
-    std::cout << (a + ((b>>=1) << 3)) << std::endl;
+    std::cout << (a + ((b >>= 1) << 3)) << std::endl;
 }
 
 int main()
