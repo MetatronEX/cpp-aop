@@ -217,7 +217,7 @@ template <class A>
 class BitwiseAspect: public A
 {
 public:
-    typedef aop::AspectAopData< ::LogicalAspect, A> AopData;
+    typedef aop::AspectAopData< ::BitwiseAspect, A> AopData;
     typedef typename AopData::Type FullType;
 
 #ifdef INHERITING_CTORS

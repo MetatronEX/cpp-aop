@@ -1,9 +1,9 @@
 CXXFLAGS=-Wall -pedantic
 
-all: cpp11 cpp98 cpp11_template_alias
+all: cpp11_template_alias cpp11_not_template_alias cpp98 
 
-cpp11: clean
-	g++ $(CXXFLAGS) -std=c++0x -I./cpp0x -o test_aop_cpp0x cpp0x/test.cpp
+cpp11_not_template_alias: clean
+	g++ $(CXXFLAGS) -std=c++0x -I./cpp11_not_template_alias -o test_aop_cpp11_not_template_alias cpp11_not_template_alias/test.cpp
 
 cpp11_template_alias: clean
 	g++ $(CXXFLAGS) -std=c++0x -I./cpp11_template_alias -o test_aop_cpp11_template_alias cpp11_template_alias/test.cpp
