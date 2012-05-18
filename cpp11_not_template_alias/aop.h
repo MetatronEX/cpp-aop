@@ -49,6 +49,7 @@ struct AspectAopData
 template <template <template <class> class> class Base>
 struct Decorate
 {
+private:
     struct None {};
 
     template <template <class> class A, class B = None>
@@ -86,6 +87,7 @@ struct Decorate
         typedef Binder<A1, typename Apply<Aspects...>::Type> Type;
     };
 
+public:
     template<template <class> class ... Aspects>
     struct with
     {
